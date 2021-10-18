@@ -1,7 +1,6 @@
 
 exports.up = function(knex) {
     return knex.schema.createTable('movies_theaters', table => {
-        table.boolean('is_showing').notNullable();
         table.integer('movie_id').unsigned().notNullable();
         table
             .foreign('movie_id')
@@ -14,6 +13,7 @@ exports.up = function(knex) {
             .references('theater_id')
             .inTable('theaters')
             .onDelete('cascade');
+        table.boolean('is_showing').notNullable();
         table.timestamps(true, true)
     })  
 };
