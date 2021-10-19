@@ -1,4 +1,5 @@
 const service = require('./movies.service');
+const asyncErrorBoundary = require('../errors/asyncErrorBoundary')
 
 const list = async (req,res,next) => {
     const { is_showing } = req.query;
@@ -12,5 +13,5 @@ const list = async (req,res,next) => {
 };
 
 module.exports = {
-    list,
+    list: asyncErrorBoundary(list),
 };
