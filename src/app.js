@@ -3,8 +3,10 @@ const express = require("express");
 const app = express();
 const morgan = require('morgan');
 const moviesRouter = require('./movies/movies.router');
-const theatersRouter =require('./theaters/theaters.router')
+const theatersRouter =require('./theaters/theaters.router');
+const cors = require ('cors');
 
+app.use(cors());
 app.use(express.json());
 app.use(morgan('combined'));
 
@@ -21,7 +23,7 @@ app.use((req, res, next) => {
 });
 
 //Error Handler
-app.use((err, req, res, next)=>{
+app.use((error, req, res, next)=>{
     const { status=500 , message = error } = error;
     res.status(status).json({ error: message });
 });
