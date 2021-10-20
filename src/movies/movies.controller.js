@@ -18,13 +18,14 @@ const movieIdExists = async (req, res, next) => {
 
 const list = async (req,res,next) => {
     const { is_showing } = req.query;
-    let movies = [];
-    if(!is_showing){
+    console.log(is_showing)
+    let movies;
+    if(is_showing === undefined){
         movies = await service.list();
     }else{
-        movies = await service.listQuery(is_showing);
+        movies = await service.listQuery();
     }
-    res.json({data: movies})
+    res.json({ data: movies })
 };
 
 const read = (req, res, next) => {

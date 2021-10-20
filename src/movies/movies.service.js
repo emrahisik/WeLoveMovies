@@ -1,15 +1,15 @@
 const knex = require('../db/connection');
 
-const list = (query) => {
+const list = () => {
     return knex('movies')
                 .select('*');
                 
 };
-const listQuery = (value) => {
+const listQuery = () => {
     return knex('movies as m')
-                .leftJoin('movies_theaters as mt', 'mt.movie_id', 'm.movie_id')
+                .join('movies_theaters as mt', 'mt.movie_id', 'm.movie_id')
                 .select('m.*')
-                .where({is_showing:value})
+                .where({is_showing: true})
                 .groupBy('m.movie_id')
                 .orderBy('movie_id');
                 
