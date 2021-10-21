@@ -2,7 +2,7 @@ const service = require('./theaters.service');
 const asyncErrorBoundary = require('../errors/asyncErrorBoundary');
 const reduceProperties = require('../utils/reduce-properties')
 
-
+//List theaters with movies' list as nested array
 const list = async (req, res, next) => {
     const data = await service.list();
     const movieConfig = {

@@ -1,6 +1,6 @@
 const knex = require('../db/connection');
 
-
+//Query specified review
 const read = (reviewId) => {
     return knex('reviews')
             .select('*')
@@ -8,6 +8,7 @@ const read = (reviewId) => {
             .first();
 };
 
+//Update specified review and return it with critic's information
 const update = (updatedReview) => {
     const criticsJoin = knex('reviews as r')
                             .select('*')
@@ -18,11 +19,10 @@ const update = (updatedReview) => {
     return knex('reviews')
             .where({review_id: updatedReview.review_id })
             .update(updatedReview,'*')
-            .then(() => criticsJoin)
-     
-            
+            .then(() => criticsJoin)            
 };
 
+//Delete specified review
 const destroy = (reviewId) => {
     return knex('reviews').where({review_id: reviewId}).del();
 };

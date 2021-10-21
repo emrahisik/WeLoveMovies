@@ -1,10 +1,14 @@
 const knex = require('../db/connection');
 
+
+//Query all movies
 const list = () => {
     return knex('movies')
                 .select('*');
                 
 };
+
+//Query all movies where is_showing is true
 const listQuery = () => {
     return knex('movies as m')
                 .join('movies_theaters as mt', 'mt.movie_id', 'm.movie_id')
@@ -15,6 +19,7 @@ const listQuery = () => {
                 
 };
 
+//Query specified movie
 const read = (movie_id) => {
     return knex('movies')
             .select('*')
@@ -22,6 +27,7 @@ const read = (movie_id) => {
             .first();
 };
 
+//Query theaters for specified movie
 const readTheaters = (movie_id) => {
     return knex('movies_theaters as mt')
             .join('theaters as t', 't.theater_id', 'mt.theater_id')
@@ -29,6 +35,7 @@ const readTheaters = (movie_id) => {
             .where({ movie_id })
 };
 
+//Query reviews for specified movie
 const readReviews = (movie_id) => {
     return knex('reviews as r')
             .join('critics as c', 'r.critic_id', 'c.critic_id')
