@@ -3,12 +3,10 @@ const mapProperties = require('../utils/map-properties');
 const asyncErrorBoundary = require('../errors/asyncErrorBoundary')
 
 //Check if review exists
-//service.read returns a review object combined with related critic
 const reviewExists = async (req, res, next) => {
     const { reviewId } = req.params;
     const review = await service.read(reviewId);
     if(review){
-        console.log(review)
         res.locals.review = review;
         next();
     }else{
@@ -19,68 +17,30 @@ const reviewExists = async (req, res, next) => {
     };
 };
 
+//Check if update entry has content and score props
+const bodyHasProperties = (req, res, next) => {
+    const validProps = ['score', 'content'];
+    const update = req.body.data;
+    const invalidProps = Object.keys(update).filter(prop => !validProps.includes(prop));
+    if(!invalidProps.length) { 
+        res.locals.reviewUpdate = update;
+        return next()
+    };
+    return next({
+        status: 400,
+        message: `not_supported. Data must include content and score properties!`
+    });
+}; 
 
-//1
-// const update = async (req, res, next) => {
-//     const reviewUpdate = req.body.data;
-//     const { review } = res.locals;
-//     const updatedReview = {
-//         ...reviewUpdate,
-//         review_id: review.review_id,
-//     };
-//     const update = await service.update(updatedReview);
-//     const reviewCritic = {
-//         ...review,
-//         ...update,
-//     };
-//     const criticConfig = {
-//         critic_id: "critic.critic_id",
-//         preferred_name: "critic.preferred_name",
-//         surname: "critic.surname",
-//         organization_name: "critic.organization_name",
-//     };
-//     const categorizedData = mapProperties(criticConfig)(reviewCritic);
-//     res.status(201).json({ data: categorizedData });
-// };
-
-//2
-// const update = async (req, res, next) => {
-//     const { review } = res.locals;
-//     const criticConfig = {
-//         critic_id: "critic.critic_id",
-//         preferred_name: "critic.preferred_name",
-//         surname: "critic.surname",
-//         organization_name: "critic.organization_name",
-//     };
-//     const categorizedReview  = mapProperties(criticConfig)(review);
-
-//     const reviewUpdate = req.body.data;
-//     const updatedReview = {
-//         ...reviewUpdate,
-//         review_id: review.review_id,
-//     };
-//     const update = await service.update(updatedReview);
-//     const reviewCritic = {
-//         ...categorizedReview,
-//         ...update,
-//     };
-    
-//     res.status(201).json({ data: reviewCritic });
-// };
-
+//Update review and return it with critic's info as a nested object
 const update = async (req, res, next) => {
-    const { review } = res.locals;
-    const reviewUpdate = req.body.data;
+    const { review, reviewUpdate } = res.locals;
+    //const { update } = req.locals;
     const updatedReview = {
         ...reviewUpdate,
         review_id: review.review_id,
     };
     const update = await service.update(updatedReview);
-    //console.log(update)
-    // const reviewCritic = {
-    //     ...review,
-    //     ...update,
-    // };
     const criticConfig = {
         preferred_name: "critic.preferred_name",
         surname: "critic.surname",
@@ -90,6 +50,8 @@ const update = async (req, res, next) => {
     res.status(201).json({ data: categorizedReview});
 };
 
+
+//Delete sepecified review
 const destroy = async (req, res, next) => {
     await service.delete(req.params.reviewId);
     res.sendStatus(204);
@@ -97,6 +59,6 @@ const destroy = async (req, res, next) => {
 
 
 module.exports = {
-    update: [asyncErrorBoundary(reviewExists), asyncErrorBoundary(update)],
+    update: [asyncErrorBoundary(reviewExists), bodyHasProperties, asyncErrorBoundary(update)],
     delete: [asyncErrorBoundary(reviewExists), asyncErrorBoundary(destroy)],
 }
